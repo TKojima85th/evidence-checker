@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  evidence-checker:
+    build: .
+    container_name: evidence-checker-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./evidence_checker.db
+      - APP_NAME=Evidence Checker API
+      - APP_VERSION=0.3.0
+      - NCBI_EMAIL=${NCBI_EMAIL:-your-email@example.com}
+      - NCBI_API_KEY=${NCBI_API_KEY:-}
+      - MAX_CLAIM_LENGTH=5000
+      - PROCESSING_TIMEOUT=30
+    volumes:
+      - ./data:/app/data
+      - ./evidence_checker.db:/app/evidence_checker.db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # オプション: Redis for caching
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: evidence-checker-redis
+  #   ports:
+  #     - "6379:6379"
+  #   restart: unless-stopped
+
+  # オプション: PostgreSQL for production
+  # postgres:
+  #   image: postgres:15
+  #   container_name: evidence-checker-db
+  #   environment:
+  #     POSTGRES_DB: evidence_checker
+  #     POSTGRES_USER: evidence_user
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   restart: unless-stopped
+
+# volumes:
+#   postgres_data:
