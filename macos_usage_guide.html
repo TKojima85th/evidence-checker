@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evidence Checker - macOS使い方ガイド</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #1d1d1f;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #1d1d1f;
+            margin-bottom: 10px;
+        }
+        
+        .header .subtitle {
+            font-size: 1.2rem;
+            color: #86868b;
+            margin-bottom: 20px;
+        }
+        
+        .version-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #30d158, #00c853);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card h2 {
+            font-size: 1.8rem;
+            color: #1d1d1f;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card h2::before {
+            content: '🍎';
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .code-block {
+            background: #1d1d1f;
+            color: #f5f5f7;
+            padding: 20px;
+            border-radius: 12px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 15px 0;
+            border: 1px solid #333;
+        }
+        
+        .code-block .comment {
+            color: #86868b;
+        }
+        
+        .terminal-prompt {
+            color: #30d158;
+        }
+        
+        .command {
+            color: #64d2ff;
+        }
+        
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(45deg, #007aff, #5856d6);
+            color: white;
+            border-radius: 50%;
+            font-weight: 600;
+            margin-right: 12px;
+            font-size: 0.9rem;
+        }
+        
+        .warning {
+            background: linear-gradient(45deg, #ff9500, #ff6b00);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        .warning::before {
+            content: '⚠️ ';
+            margin-right: 8px;
+        }
+        
+        .success {
+            background: linear-gradient(45deg, #30d158, #00c853);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        .success::before {
+            content: '✅ ';
+            margin-right: 8px;
+        }
+        
+        .api-endpoint {
+            background: linear-gradient(45deg, #007aff, #5856d6);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.85rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(45deg, #007aff, #5856d6);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+        
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 40px;
+            padding: 20px;
+        }
+        
+        .tab-container {
+            margin: 20px 0;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab-button {
+            padding: 10px 20px;
+            background: #f5f5f7;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .tab-button.active {
+            background: #007aff;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Evidence Checker</h1>
+            <p class="subtitle">医学・健康情報のエビデンス自動評価システム</p>
+            <span class="version-badge">v0.3.0 for macOS</span>
+        </div>
+
+        <div class="content">
+            <div class="card">
+                <h2><span class="step-number">1</span>セットアップ</h2>
+                <p>必要なツールをインストールします：</p>
+                <div class="code-block">
+<span class="comment"># Homebrewでツールをインストール</span>
+<span class="terminal-prompt">$</span> <span class="command">brew install poetry jq httpie</span>
+
+<span class="comment"># プロジェクトディレクトリに移動</span>
+<span class="terminal-prompt">$</span> <span class="command">cd "/Users/tkojima/claude code/Evidence_Checker"</span>
+
+<span class="comment"># 依存関係のインストール</span>
+<span class="terminal-prompt">$</span> <span class="command">make install</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><span class="step-number">2</span>サーバー起動</h2>
+                <p>Evidence Checkerを起動します：</p>
+                <div class="code-block">
+<span class="comment"># 開発サーバー起動</span>
+<span class="terminal-prompt">$</span> <span class="command">make run</span>
+
+<span class="comment"># または直接起動</span>
+<span class="terminal-prompt">$</span> <span class="command">poetry run uvicorn src.main:app --reload</span>
+                </div>
+                <div class="success">
+                    起動後、http://localhost:8000 でアクセスできます
+                </div>
+            </div>
+
+            <div class="card full-width">
+                <h2><span class="step-number">3</span>API使用方法</h2>
+                
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="showTab('curl')">curl</button>
+                        <button class="tab-button" onclick="showTab('httpie')">HTTPie</button>
+                        <button class="tab-button" onclick="showTab('browser')">ブラウザ</button>
+                    </div>
+                    
+                    <div id="curl" class="tab-content active">
+                        <h3>cURLを使用</h3>
+                        <div class="code-block">
+<span class="comment"># 基本的な評価リクエスト</span>
+<span class="terminal-prompt">$</span> <span class="command">curl -X POST "http://localhost:8000/api/v1/score" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "claim_text": "ビタミンDは免疫機能をサポートする",
+       "topic": "health",
+       "lang": "ja"
+     }' | jq '.'</span>
+
+<span class="comment"># より詳細な情報を含むリクエスト</span>
+<span class="terminal-prompt">$</span> <span class="command">curl -X POST "http://localhost:8000/api/v1/score" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "claim_text": "定期的な運動は心臓病のリスクを30%減少させる",
+       "source_url": "https://example.com/health-article",
+       "topic": "health"
+     }' | jq '.total_score, .label, .rationales'</span>
+                        </div>
+                    </div>
+                    
+                    <div id="httpie" class="tab-content">
+                        <h3>HTTPie（推奨）</h3>
+                        <div class="code-block">
+<span class="comment"># シンプルで読みやすい構文</span>
+<span class="terminal-prompt">$</span> <span class="command">http POST localhost:8000/api/v1/score \
+     claim_text="ビタミンDは免疫機能をサポートする" \
+     topic=health \
+     lang=ja</span>
+
+<span class="comment"># 有害な情報のテスト</span>
+<span class="terminal-prompt">$</span> <span class="command">http POST localhost:8000/api/v1/score \
+     claim_text="ワクチンは危険で不要です" \
+     topic=health</span>
+                        </div>
+                    </div>
+                    
+                    <div id="browser" class="tab-content">
+                        <h3>ブラウザでテスト</h3>
+                        <div class="code-block">
+<span class="comment"># Swagger UIを開く</span>
+<span class="terminal-prompt">$</span> <span class="command">open http://localhost:8000/docs</span>
+
+<span class="comment"># ヘルスチェック</span>
+<span class="terminal-prompt">$</span> <span class="command">open http://localhost:8000/health/</span>
+                        </div>
+                        <p>Swagger UIでは、インタラクティブにAPIをテストできます。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><span class="step-number">4</span>Docker使用</h2>
+                <p>Docker環境での実行：</p>
+                <div class="code-block">
+<span class="comment"># Docker Composeで起動</span>
+<span class="terminal-prompt">$</span> <span class="command">make docker-compose-up</span>
+
+<span class="comment"># ログの確認</span>
+<span class="terminal-prompt">$</span> <span class="command">docker-compose logs -f evidence-checker</span>
+
+<span class="comment"># 停止</span>
+<span class="terminal-prompt">$</span> <span class="command">make docker-compose-down</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><span class="step-number">5</span>テスト実行</h2>
+                <p>システムの動作確認：</p>
+                <div class="code-block">
+<span class="comment"># 全テスト実行</span>
+<span class="terminal-prompt">$</span> <span class="command">make test-all</span>
+
+<span class="comment"># APIテストのみ</span>
+<span class="terminal-prompt">$</span> <span class="command">make test-api</span>
+
+<span class="comment"># パフォーマンステスト</span>
+<span class="terminal-prompt">$</span> <span class="command">make benchmark</span>
+                </div>
+            </div>
+
+            <div class="card full-width">
+                <h2><span class="step-number">6</span>実用例</h2>
+                <p>よくある使用パターン：</p>
+                
+                <h3>📝 ファイルから主張を読み込み</h3>
+                <div class="code-block">
+<span class="comment"># テスト用ファイルの作成</span>
+<span class="terminal-prompt">$</span> <span class="command">echo "ビタミンCは風邪予防に効果的です" > claim.txt</span>
+
+<span class="comment"># ファイルから読み込んで評価</span>
+<span class="terminal-prompt">$</span> <span class="command">http POST localhost:8000/api/v1/score \
+     claim_text="$(cat claim.txt)" \
+     topic=health</span>
+                </div>
+
+                <h3>🔄 複数の主張を連続評価</h3>
+                <div class="code-block">
+<span class="comment"># スクリプトファイルの作成</span>
+<span class="terminal-prompt">$</span> <span class="command">cat > test_claims.sh << 'EOF'
+#!/bin/bash
+claims=(
+    "ビタミンDは免疫機能をサポートする"
+    "定期的な運動は心臓病リスクを減少させる"
+    "ワクチンは危険で不要です"
+)
+
+for claim in "${claims[@]}"; do
+    echo "=== 評価中: $claim ==="
+    http POST localhost:8000/api/v1/score \
+         claim_text="$claim" \
+         topic=health | jq '.total_score, .label'
+    echo ""
+done
+EOF</span>
+
+<span class="comment"># 実行権限を付与して実行</span>
+<span class="terminal-prompt">$</span> <span class="command">chmod +x test_claims.sh && ./test_claims.sh</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📊 レスポンス例</h2>
+                <p>APIから返される典型的なレスポンス：</p>
+                <div class="code-block">
+{
+  "total_score": 72,
+  "label": "Mostly True",
+  "axis_scores": {
+    "clarity": 4,
+    "evidence_quality": 3,
+    "consensus": 4,
+    "biological_plausibility": 4,
+    "transparency": 2,
+    "context_distortion": 4,
+    "harm_potential": 5,
+    "virality": 3,
+    "correction_response": 0
+  },
+  "evidence_top3": [
+    {
+      "source": "12345678",
+      "title": "Vitamin D research...",
+      "stance": "support",
+      "relevance_score": 0.8
+    }
+  ]
+}
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🛠️ 便利なエイリアス</h2>
+                <p><code>~/.zshrc</code> に追加すると便利：</p>
+                <div class="code-block">
+<span class="comment"># Evidence Checker用エイリアス</span>
+alias ec-start="cd '/Users/tkojima/claude code/Evidence_Checker' && make run"
+alias ec-test="cd '/Users/tkojima/claude code/Evidence_Checker' && make test-all"
+alias ec-check="http GET localhost:8000/health/"
+alias ec-eval="http POST localhost:8000/api/v1/score claim_text="
+
+<span class="comment"># 使用例</span>
+<span class="terminal-prompt">$</span> <span class="command">ec-eval "ビタミンDは健康に良い"</span>
+                </div>
+            </div>
+
+            <div class="card full-width">
+                <h2>🔧 トラブルシューティング</h2>
+                
+                <div class="warning">
+                    <strong>ポート競合エラー</strong><br>
+                    8000番ポートが使用中の場合：
+                    <div class="code-block">
+<span class="terminal-prompt">$</span> <span class="command">lsof -i :8000</span>
+<span class="terminal-prompt">$</span> <span class="command">kill -9 $(lsof -ti:8000)</span>
+                    </div>
+                </div>
+
+                <div class="warning">
+                    <strong>SSL証明書エラー</strong><br>
+                    Python証明書の問題：
+                    <div class="code-block">
+<span class="terminal-prompt">$</span> <span class="command">/Applications/Python\ 3.11/Install\ Certificates.command</span>
+                    </div>
+                </div>
+
+                <div class="warning">
+                    <strong>M1/M2 Mac</strong><br>
+                    Docker実行時の問題：
+                    <div class="code-block">
+<span class="terminal-prompt">$</span> <span class="command">docker-compose up --platform linux/amd64</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card full-width">
+                <h2>🎯 活用シーン</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+                    <div style="padding: 20px; background: #f5f5f7; border-radius: 12px;">
+                        <h4>📱 SNS投稿チェック</h4>
+                        <p>健康関連の投稿内容を事前に評価</p>
+                    </div>
+                    <div style="padding: 20px; background: #f5f5f7; border-radius: 12px;">
+                        <h4>📰 記事検証</h4>
+                        <p>メディア記事の信頼性を客観的に判定</p>
+                    </div>
+                    <div style="padding: 20px; background: #f5f5f7; border-radius: 12px;">
+                        <h4>🎓 教育ツール</h4>
+                        <p>批判的思考力の向上をサポート</p>
+                    </div>
+                    <div style="padding: 20px; background: #f5f5f7; border-radius: 12px;">
+                        <h4>🔬 研究支援</h4>
+                        <p>文献レビューの効率化</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>
+                <a href="https://github.com/TKojima85th/evidence-checker" class="btn">
+                    📚 GitHubリポジトリを見る
+                </a>
+            </p>
+            <p style="margin-top: 20px;">
+                Evidence Checker v0.3.0 | 
+                🤖 Generated with <a href="https://claude.ai/code" style="color: rgba(255,255,255,0.8);">Claude Code</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // すべてのタブコンテンツを非表示
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // すべてのタブボタンから active クラスを削除
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+            
+            // 指定されたタブを表示
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // スムーズスクロールの実装
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // ページロード時のアニメーション
+        window.addEventListener('load', function() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
