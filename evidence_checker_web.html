@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evidence Checker - 評価ツール</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #1d1d1f;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1d1d1f;
+            margin-bottom: 10px;
+        }
+        
+        .form-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e5e5e7;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #007aff;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #007aff, #5856d6);
+            color: white;
+            border: none;
+            padding: 18px 36px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 122, 255, 0.3);
+        }
+        
+        .btn-primary:disabled {
+            background: #c7c7cc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e5e5e7;
+            border-top: 4px solid #007aff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result-card {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .score-display {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .score-true { background: linear-gradient(45deg, #30d158, #00c853); }
+        .score-mostly-true { background: linear-gradient(45deg, #32d74b, #34c759); }
+        .score-unsupported { background: linear-gradient(45deg, #ff9500, #ff6b00); }
+        .score-false { background: linear-gradient(45deg, #ff3b30, #ff2d20); }
+        .score-fabricated { background: linear-gradient(45deg, #ff3b30, #d70015); }
+        
+        .score-label {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .detail-section {
+            background: #f5f5f7;
+            padding: 25px;
+            border-radius: 12px;
+        }
+        
+        .detail-section h3 {
+            color: #1d1d1f;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .axis-score {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e5e7;
+        }
+        
+        .axis-score:last-child {
+            border-bottom: none;
+        }
+        
+        .axis-name {
+            font-weight: 500;
+        }
+        
+        .axis-value {
+            font-weight: 600;
+            color: #007aff;
+        }
+        
+        .evidence-item {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .evidence-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1d1d1f;
+        }
+        
+        .evidence-meta {
+            font-size: 0.9rem;
+            color: #86868b;
+            margin-bottom: 10px;
+        }
+        
+        .stance-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        
+        .stance-support { background: #e8f5e8; color: #30d158; }
+        .stance-contradict { background: #ffe8e8; color: #ff3b30; }
+        .stance-neutral { background: #f0f0f0; color: #86868b; }
+        
+        .rationale-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #007aff;
+        }
+        
+        .rationale-axis {
+            font-weight: 600;
+            color: #007aff;
+            margin-bottom: 5px;
+        }
+        
+        .rationale-text {
+            color: #1d1d1f;
+            line-height: 1.5;
+        }
+        
+        .btn-secondary {
+            background: #f5f5f7;
+            color: #1d1d1f;
+            border: 2px solid #e5e5e7;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+        
+        .btn-secondary:hover {
+            background: #e5e5e7;
+        }
+        
+        .log-info {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            color: #007aff;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header,
+            .form-card,
+            .result-card {
+                padding: 25px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Evidence Checker</h1>
+            <p>医学・健康情報のエビデンス自動評価ツール</p>
+        </div>
+
+        <!-- 入力フォーム -->
+        <div class="form-card" id="inputForm">
+            <h2 style="margin-bottom: 30px; color: #1d1d1f;">評価したい主張を入力してください</h2>
+            
+            <form id="evaluationForm">
+                <div class="form-group">
+                    <label for="claimText">主張文 *</label>
+                    <textarea 
+                        id="claimText" 
+                        name="claimText" 
+                        placeholder="例：ビタミンDは免疫機能をサポートする効果があります"
+                        required
+                    ></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sourceUrl">出典URL（任意）</label>
+                    <input 
+                        type="url" 
+                        id="sourceUrl" 
+                        name="sourceUrl" 
+                        placeholder="https://example.com/article"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="topic">トピック</label>
+                    <select id="topic" name="topic">
+                        <option value="health">健康・医学</option>
+                        <option value="nutrition">栄養・食事</option>
+                        <option value="medicine">医薬品</option>
+                        <option value="fitness">運動・フィットネス</option>
+                        <option value="other">その他</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="evaluatorComment">評価者コメント（任意）</label>
+                    <textarea 
+                        id="evaluatorComment" 
+                        name="evaluatorComment" 
+                        placeholder="この評価に関するコメントがあれば入力してください"
+                        rows="3"
+                    ></textarea>
+                </div>
+                
+                <button type="submit" class="btn-primary" id="submitBtn">
+                    🔍 エビデンスを評価する
+                </button>
+            </form>
+        </div>
+
+        <!-- ローディング表示 -->
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <p>エビデンスを検索・分析中です...<br>少々お待ちください（最大30秒）</p>
+        </div>
+
+        <!-- 結果表示 -->
+        <div class="result-card" id="resultCard">
+            <h2 style="margin-bottom: 30px; color: #1d1d1f;">📋 評価結果</h2>
+            
+            <!-- 総合スコア表示 -->
+            <div class="score-display">
+                <div class="score-circle" id="scoreCircle">
+                    <span id="totalScore">--</span>
+                </div>
+                <div class="score-label" id="scoreLabel">--</div>
+                <p id="scoreDescription">評価中...</p>
+            </div>
+
+            <!-- 詳細情報 -->
+            <div class="details-grid">
+                <!-- 9軸スコア -->
+                <div class="detail-section">
+                    <h3>📊 9軸スコア詳細</h3>
+                    <div id="axisScores">
+                        <!-- JavaScriptで動的に生成 -->
+                    </div>
+                </div>
+
+                <!-- エビデンス情報 -->
+                <div class="detail-section">
+                    <h3>📚 検索されたエビデンス</h3>
+                    <div id="evidenceList">
+                        <!-- JavaScriptで動的に生成 -->
+                    </div>
+                </div>
+
+                <!-- 判定理由 -->
+                <div class="detail-section">
+                    <h3>💭 判定理由</h3>
+                    <div id="rationales">
+                        <!-- JavaScriptで動的に生成 -->
+                    </div>
+                </div>
+
+                <!-- メタ情報 -->
+                <div class="detail-section">
+                    <h3>ℹ️ 評価情報</h3>
+                    <div id="metadata">
+                        <!-- JavaScriptで動的に生成 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ログ情報 -->
+            <div class="log-info" id="logInfo">
+                この評価結果はログID: <span id="logId">--</span> として記録されました。
+                Excel ファイル（logs/evaluation_log.xlsx）で詳細を確認できます。
+            </div>
+
+            <!-- アクション -->
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn-secondary" onclick="resetForm()">🔄 新しい評価を開始</button>
+                <button class="btn-secondary" onclick="downloadLog()">📥 ログをダウンロード</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8000';
+        
+        document.getElementById('evaluationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const claimText = document.getElementById('claimText').value.trim();
+            if (!claimText) {
+                alert('主張文を入力してください。');
+                return;
+            }
+            
+            // UI状態を変更
+            document.getElementById('inputForm').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resultCard').style.display = 'none';
+            
+            try {
+                const requestData = {
+                    claim_text: claimText,
+                    source_url: document.getElementById('sourceUrl').value || null,
+                    topic: document.getElementById('topic').value,
+                    lang: 'ja'
+                };
+                
+                const response = await fetch(`${API_BASE_URL}/api/v1/score`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                displayResults(result);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('評価中にエラーが発生しました。サーバーが起動しているか確認してください。');
+                resetForm();
+            }
+        });
+        
+        function displayResults(result) {
+            // ローディングを非表示
+            document.getElementById('loading').style.display = 'none';
+            
+            // 総合スコア表示
+            const totalScore = result.total_score;
+            const label = result.label;
+            
+            document.getElementById('totalScore').textContent = totalScore;
+            document.getElementById('scoreLabel').textContent = getLabelText(label);
+            document.getElementById('scoreDescription').textContent = getScoreDescription(totalScore);
+            
+            // スコア円の色を設定
+            const scoreCircle = document.getElementById('scoreCircle');
+            scoreCircle.className = 'score-circle ' + getScoreClass(label);
+            
+            // 9軸スコア表示
+            displayAxisScores(result.axis_scores);
+            
+            // エビデンス表示
+            displayEvidence(result.evidence_top3);
+            
+            // 判定理由表示
+            displayRationales(result.rationales);
+            
+            // メタ情報表示
+            displayMetadata(result.metadata);
+            
+            // ログID表示
+            document.getElementById('logId').textContent = result.log_id || '記録されませんでした';
+            
+            // 結果カードを表示
+            document.getElementById('resultCard').style.display = 'block';
+        }
+        
+        function displayAxisScores(axisScores) {
+            const container = document.getElementById('axisScores');
+            const axisNames = {
+                clarity: '主張の明確性',
+                evidence_quality: '証拠の質',
+                consensus: '学術合意',
+                biological_plausibility: '生物学的妥当性',
+                transparency: 'データ透明性',
+                context_distortion: '文脈歪曲リスク',
+                harm_potential: '害の可能性',
+                virality: '拡散性',
+                correction_response: '訂正対応'
+            };
+            
+            container.innerHTML = '';
+            for (const [key, value] of Object.entries(axisScores)) {
+                const div = document.createElement('div');
+                div.className = 'axis-score';
+                div.innerHTML = `
+                    <span class="axis-name">${axisNames[key] || key}</span>
+                    <span class="axis-value">${value}/5</span>
+                `;
+                container.appendChild(div);
+            }
+        }
+        
+        function displayEvidence(evidenceList) {
+            const container = document.getElementById('evidenceList');
+            container.innerHTML = '';
+            
+            if (!evidenceList || evidenceList.length === 0) {
+                container.innerHTML = '<p>エビデンスが見つかりませんでした。</p>';
+                return;
+            }
+            
+            evidenceList.forEach((evidence, index) => {
+                const div = document.createElement('div');
+                div.className = 'evidence-item';
+                div.innerHTML = `
+                    <div class="evidence-title">${evidence.title || 'タイトル不明'}</div>
+                    <div class="evidence-meta">
+                        PMID: ${evidence.source || 'N/A'} | 
+                        関連度: ${(evidence.relevance_score * 100).toFixed(1)}%
+                    </div>
+                    <span class="stance-tag stance-${evidence.stance}">${getStanceText(evidence.stance)}</span>
+                    <div style="margin-top: 10px;">
+                        ${evidence.summary || '要約なし'}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        function displayRationales(rationales) {
+            const container = document.getElementById('rationales');
+            container.innerHTML = '';
+            
+            if (!rationales || rationales.length === 0) {
+                container.innerHTML = '<p>判定理由の詳細情報がありません。</p>';
+                return;
+            }
+            
+            rationales.forEach(rationale => {
+                const div = document.createElement('div');
+                div.className = 'rationale-item';
+                div.innerHTML = `
+                    <div class="rationale-axis">${rationale.axis} (${rationale.score}/5)</div>
+                    <div class="rationale-text">${rationale.reasoning}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        function displayMetadata(metadata) {
+            const container = document.getElementById('metadata');
+            container.innerHTML = `
+                <div class="axis-score">
+                    <span class="axis-name">処理時間</span>
+                    <span class="axis-value">${metadata.processing_time.toFixed(2)}秒</span>
+                </div>
+                <div class="axis-score">
+                    <span class="axis-name">モデルバージョン</span>
+                    <span class="axis-value">${metadata.model_version}</span>
+                </div>
+                <div class="axis-score">
+                    <span class="axis-name">信頼度</span>
+                    <span class="axis-value">${(metadata.confidence * 100).toFixed(1)}%</span>
+                </div>
+                <div class="axis-score">
+                    <span class="axis-name">評価日時</span>
+                    <span class="axis-value">${new Date(metadata.timestamp).toLocaleString('ja-JP')}</span>
+                </div>
+            `;
+        }
+        
+        function getLabelText(label) {
+            const labels = {
+                'True': '正確',
+                'Mostly True': '概ね正確',
+                'Unsupported': '根拠薄い',
+                'False': '不正確',
+                'Fabricated': '虚偽'
+            };
+            return labels[label] || label;
+        }
+        
+        function getScoreClass(label) {
+            const classes = {
+                'True': 'score-true',
+                'Mostly True': 'score-mostly-true',
+                'Unsupported': 'score-unsupported',
+                'False': 'score-false',
+                'Fabricated': 'score-fabricated'
+            };
+            return classes[label] || 'score-unsupported';
+        }
+        
+        function getScoreDescription(score) {
+            if (score >= 90) return '信頼性の高い主張です';
+            if (score >= 75) return '概ね信頼できる主張です';
+            if (score >= 55) return '根拠が不十分またはミスリーディングの可能性があります';
+            if (score >= 35) return '不正確な主張です';
+            return '虚偽または根拠のない主張です';
+        }
+        
+        function getStanceText(stance) {
+            const stances = {
+                'support': '支持',
+                'contradict': '反対',
+                'neutral': '中立'
+            };
+            return stances[stance] || stance;
+        }
+        
+        function resetForm() {
+            document.getElementById('inputForm').style.display = 'block';
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('resultCard').style.display = 'none';
+            document.getElementById('evaluationForm').reset();
+        }
+        
+        async function downloadLog() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/v1/logs/download`);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'evaluation_log.xlsx';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    alert('ログファイルのダウンロードに失敗しました。');
+                }
+            } catch (error) {
+                console.error('Download error:', error);
+                alert('ログファイルのダウンロード中にエラーが発生しました。');
+            }
+        }
+        
+        // ページロード時にサーバー接続確認
+        window.addEventListener('load', async function() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/health/`);
+                if (!response.ok) {
+                    throw new Error('Server not responding');
+                }
+                console.log('Server connection OK');
+            } catch (error) {
+                console.warn('Server connection failed:', error);
+                alert('サーバーに接続できませんでした。Evidence Checkerが起動しているか確認してください。\n\n起動方法: make run');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+{
+  "claim_type": "intervention",
+  "alignment_to_claim": "supports",
+  "GRADE_certainty": "moderate",
+  "included_studies": [
+    {
+      "design": "Systematic Review and Meta-analysis",
+      "year": 2023,
+      "retraction_status": "active",
+      "effect_direction": "decrease",
+      "effect_size": {
+        "measure": "RR",
+        "value": 0.75,
+        "ci": "0.68-0.82",
+        "p": "<0.001"
+      },
+      "primary_outcomes": [
+        "incidence"
+      ]
+    },
+    {
+      "design": "Randomized Controlled Trial",
+      "year": 2022,
+      "retraction_status": "active",
+      "effect_direction": "decrease",
+      "effect_size": {
+        "measure": "RR",
+        "value": 0.78,
+        "ci": "0.70-0.90",
+        "p": "0.002"
+      },
+      "primary_outcomes": [
+        "incidence"
+      ]
+    }
+  ],
+  "citation_verifiability_rate": 0.9,
+  "newest_key_evidence_year": 2023,
+  "guideline_year": 2022,
+  "numeric_diffs": [
+    0.03
+  ],
+  "semantic_exact_if_non_numeric": "exact",
+  "stats_integrity_flags": {
+    "ci_present": true,
+    "abs_risk_present": true,
+    "rr_abs_confused": false,
+    "unit_errors": false
+  },
+  "language_assertiveness_score": -1,
+  "exaggeration_level": 1,
+  "completeness_checks": {
+    "targets": true,
+    "dose": true,
+    "effect": true,
+    "harms": true,
+    "contraind": true,
+    "heterogeneity": true
+  },
+  "balance_flags": {
+    "mentions_counterevidence": true,
+    "bias_to_benefit": false
+  },
+  "safety_flags": {
+    "adverse_events_quantified": true,
+    "high_risk_groups": true,
+    "clinical_guidance": true
+  },
+  "bonus_flags": {
+    "uncertainty_transparency": 3,
+    "nnt_nnh": 3,
+    "external_validation": 2,
+    "triangulation": 2
+  },
+  "penalties_flags": {
+    "retracted_as_major": false,
+    "fabricated": false,
+    "predatory_major": false,
+    "major_safety_omission": false,
+    "causation_misuse": false,
+    "cherry_pick": false,
+    "guideline_misquote": false,
+    "too_old_only": false,
+    "fear_appeal": false,
+    "scale_exaggeration": false,
+    "term_misuse": false,
+    "overgeneralization": false
+  }
+}

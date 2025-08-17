@@ -1,0 +1,342 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Evidence Scoring Payload (Unified Rubric v3.0)",
+  "type": "object",
+  "required": [
+    "claim_type",
+    "alignment_to_claim",
+    "GRADE_certainty",
+    "included_studies",
+    "citation_verifiability_rate",
+    "newest_key_evidence_year",
+    "language_assertiveness_score",
+    "exaggeration_level",
+    "completeness_checks",
+    "balance_flags",
+    "safety_flags",
+    "bonus_flags",
+    "penalties_flags"
+  ],
+  "properties": {
+    "claim_type": {
+      "type": "string",
+      "enum": [
+        "intervention",
+        "exposure",
+        "diagnostic",
+        "mechanistic",
+        "policy"
+      ]
+    },
+    "alignment_to_claim": {
+      "type": "string",
+      "enum": [
+        "supports",
+        "partially_supports",
+        "neutral",
+        "contradicts",
+        "insufficient"
+      ]
+    },
+    "GRADE_certainty": {
+      "type": "string",
+      "enum": [
+        "high",
+        "moderate",
+        "low",
+        "very_low"
+      ]
+    },
+    "included_studies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "design",
+          "year",
+          "retraction_status"
+        ],
+        "properties": {
+          "design": {
+            "type": "string"
+          },
+          "year": {
+            "type": "integer"
+          },
+          "country": {
+            "type": "string"
+          },
+          "retraction_status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "retracted",
+              "expression_of_concern",
+              "unknown"
+            ]
+          },
+          "effect_direction": {
+            "type": "string",
+            "enum": [
+              "increase",
+              "no_increase",
+              "decrease",
+              "mixed",
+              "not_reported"
+            ]
+          },
+          "effect_size": {
+            "type": "object",
+            "properties": {
+              "measure": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "ci": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "p": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "primary_outcomes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "citation_verifiability_rate": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "newest_key_evidence_year": {
+      "type": "integer"
+    },
+    "guideline_year": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "numeric_diffs": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "semantic_exact_if_non_numeric": {
+      "type": "string",
+      "enum": [
+        "exact",
+        "minor",
+        "major",
+        "wrong"
+      ],
+      "default": "exact"
+    },
+    "stats_integrity_flags": {
+      "type": "object",
+      "properties": {
+        "ci_present": {
+          "type": "boolean"
+        },
+        "abs_risk_present": {
+          "type": "boolean"
+        },
+        "rr_abs_confused": {
+          "type": "boolean"
+        },
+        "unit_errors": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "ci_present",
+        "abs_risk_present",
+        "rr_abs_confused",
+        "unit_errors"
+      ]
+    },
+    "language_assertiveness_score": {
+      "type": "integer",
+      "minimum": -5,
+      "maximum": 3
+    },
+    "exaggeration_level": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 5
+    },
+    "completeness_checks": {
+      "type": "object",
+      "properties": {
+        "targets": {
+          "type": "boolean"
+        },
+        "dose": {
+          "type": "boolean"
+        },
+        "effect": {
+          "type": "boolean"
+        },
+        "harms": {
+          "type": "boolean"
+        },
+        "contraind": {
+          "type": "boolean"
+        },
+        "heterogeneity": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "targets",
+        "dose",
+        "effect",
+        "harms",
+        "contraind",
+        "heterogeneity"
+      ]
+    },
+    "balance_flags": {
+      "type": "object",
+      "properties": {
+        "mentions_counterevidence": {
+          "type": "boolean"
+        },
+        "bias_to_benefit": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "mentions_counterevidence",
+        "bias_to_benefit"
+      ]
+    },
+    "safety_flags": {
+      "type": "object",
+      "properties": {
+        "adverse_events_quantified": {
+          "type": "boolean"
+        },
+        "high_risk_groups": {
+          "type": "boolean"
+        },
+        "clinical_guidance": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "adverse_events_quantified",
+        "high_risk_groups",
+        "clinical_guidance"
+      ]
+    },
+    "bonus_flags": {
+      "type": "object",
+      "properties": {
+        "uncertainty_transparency": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "nnt_nnh": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "external_validation": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "triangulation": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        }
+      },
+      "required": [
+        "uncertainty_transparency",
+        "nnt_nnh",
+        "external_validation",
+        "triangulation"
+      ]
+    },
+    "penalties_flags": {
+      "type": "object",
+      "properties": {
+        "retracted_as_major": {
+          "type": "boolean"
+        },
+        "fabricated": {
+          "type": "boolean"
+        },
+        "predatory_major": {
+          "type": "boolean"
+        },
+        "major_safety_omission": {
+          "type": "boolean"
+        },
+        "causation_misuse": {
+          "type": "boolean"
+        },
+        "cherry_pick": {
+          "type": "boolean"
+        },
+        "guideline_misquote": {
+          "type": "boolean"
+        },
+        "too_old_only": {
+          "type": "boolean"
+        },
+        "fear_appeal": {
+          "type": "boolean"
+        },
+        "scale_exaggeration": {
+          "type": "boolean"
+        },
+        "term_misuse": {
+          "type": "boolean"
+        },
+        "overgeneralization": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "retracted_as_major",
+        "fabricated",
+        "predatory_major",
+        "major_safety_omission",
+        "causation_misuse",
+        "cherry_pick",
+        "guideline_misquote",
+        "too_old_only",
+        "fear_appeal",
+        "scale_exaggeration",
+        "term_misuse",
+        "overgeneralization"
+      ]
+    }
+  }
+}

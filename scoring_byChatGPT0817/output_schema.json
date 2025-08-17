@@ -1,0 +1,213 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Evidence Scoring Result (Unified Rubric v3.0)",
+  "type": "object",
+  "required": [
+    "score_breakdown",
+    "base",
+    "bonus",
+    "penalties",
+    "total_score",
+    "label",
+    "confidence"
+  ],
+  "properties": {
+    "score_breakdown": {
+      "type": "object",
+      "required": [
+        "A_scientific_accuracy",
+        "B_evidence_base",
+        "C_expression",
+        "D_completeness_safety"
+      ],
+      "properties": {
+        "A_scientific_accuracy": {
+          "type": "object",
+          "required": [
+            "facts",
+            "causality",
+            "stats",
+            "cap_applied",
+            "subtotal"
+          ],
+          "properties": {
+            "facts": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 15
+            },
+            "causality": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 15
+            },
+            "stats": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "cap_applied": {
+              "type": "boolean"
+            },
+            "subtotal": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 40
+            }
+          }
+        },
+        "B_evidence_base": {
+          "type": "object",
+          "required": [
+            "quality",
+            "appropriateness_verifiability_recency",
+            "cap_applied",
+            "subtotal"
+          ],
+          "properties": {
+            "quality": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 15
+            },
+            "appropriateness_verifiability_recency": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "cap_applied": {
+              "type": "boolean"
+            },
+            "subtotal": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 25
+            }
+          }
+        },
+        "C_expression": {
+          "type": "object",
+          "required": [
+            "certainty_tone",
+            "no_exaggeration",
+            "subtotal"
+          ],
+          "properties": {
+            "certainty_tone": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "no_exaggeration": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "subtotal": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20
+            }
+          }
+        },
+        "D_completeness_safety": {
+          "type": "object",
+          "required": [
+            "coverage",
+            "balance",
+            "safety",
+            "subtotal"
+          ],
+          "properties": {
+            "coverage": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 7
+            },
+            "balance": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4
+            },
+            "safety": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4
+            },
+            "subtotal": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 15
+            }
+          }
+        }
+      }
+    },
+    "base": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "bonus": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "points"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "points": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "penalties": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "points"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "points": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "total_score": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "label": {
+      "type": "string",
+      "enum": [
+        "True",
+        "Mostly True",
+        "Mixed/Context",
+        "Unsupported",
+        "Misleading",
+        "False",
+        "Harmful"
+      ]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    }
+  }
+}

@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   evidence-checker:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile.minimal
     container_name: evidence-checker-api
     ports:
       - "8000:8000"
